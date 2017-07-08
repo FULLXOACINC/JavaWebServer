@@ -22,10 +22,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="JavaWebServer" />
         <module name="TEst" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="JavaWebServer" target="1.5" />
       <module name="TEst" target="1.5" />
     </bytecodeTargetLevel>
   </component>

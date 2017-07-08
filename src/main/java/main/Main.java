@@ -1,21 +1,24 @@
+package main;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import servlets.AllRequestsServlet;
 
 /**
- * Created by alex on 8.7.17.
+ * @author alex
  */
 public class Main {
-    public static void main(String[] args) throws Exception{
-        FrontEnd frontend =new FrontEnd();
+    public static void main(String[] args) throws Exception {
+        AllRequestsServlet allRequestsServlet = new AllRequestsServlet();
 
-        Server server =new Server(8080);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.addServlet(new ServletHolder(allRequestsServlet), "/*");
+
+        Server server = new Server(8080);
         server.setHandler(context);
-        context.addServlet(new ServletHolder(frontend),"/authform");
 
         server.start();
         server.join();
-
     }
 }
