@@ -15,16 +15,20 @@ import dbService.dataSets.UsersDataSet;
 public class Main {
     public static void main(String[] args) {
         DBService dbService = new DBService();
-//        dbService.printConnectInfo();
         try {
             dbService.addUser("ALex","1111","ALex","Black");
             dbService.addUser("Billy","2222","Billy","Blue");
             dbService.addUser("Bob","3333","Bob","Green");
+            dbService.addUser("Join","4444","Join","Void");
 
 
-            System.out.println("User data set: " + dbService.getUser("ALex"));
-            System.out.println("User data set: " + dbService.getUser("Billy"));
-            System.out.println("User data set: " + dbService.getUser("Bob"));
+//
+//            System.out.println("User data set: " + dbService.getUser("ALex"));
+//            System.out.println("User data set: " + dbService.getUser("Billy"));
+//            System.out.println("User data set: " + dbService.getUser("Bob"));
+            System.out.println("User data set: " + dbService.getAllUsers());
+
+
 
 
             dbService.cleanUp();

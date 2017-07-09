@@ -5,6 +5,8 @@ import dbService.executor.Executor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author v.chibrikov
@@ -27,13 +29,24 @@ public class UsersDAO {
             return new UsersDataSet(result.getString(1), result.getString(2), result.getString(3), result.getString(4));
         });
     }
-
-    public long getUserId(String name) throws SQLException {
-        return executor.execQuery("select * from users where user_name='" + name + "'", result -> {
+    public List<UsersDataSet> getAll() throws SQLException {
+        return executor.execQuery("select * from users ", result -> {
+            List<UsersDataSet> users= new ArrayList<UsersDataSet>();
             result.next();
-            return result.getLong(1);
+            while(!result.isLast()){
+                users.add( new UsersDataSet(result.getString(1), result.getString(2), result.getString(3), result.getString(4)));
+                result.next();
+            }
+            return users;
         });
     }
+
+//    public long getUserId(String name) throws SQLException {
+//        return executor.execQuery("select * from users where user_name='" + name + "'", result -> {
+//            result.next();
+//            return result.getLong(1);
+//        });
+//    }
 
     public void insertUser(String login,String password,String firstName,String lastName) throws SQLException {
         executor.execUpdate("insert into users (Login,Password,LastName,FirstName) values ('" + login + "','"+password+ "','"+firstName+ "','"+lastName+"')");

@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
+
 /**
  * @author v.chibrikov
  *         <p>
@@ -26,7 +28,15 @@ public class DBService {
         try {
             return (new UsersDAO(connection).get(login));
         } catch (SQLException e) {
-            throw new DBException(e);
+                return null;
+//            throw new DBException(e);
+        }
+    }
+    public List<UsersDataSet> getAllUsers() throws DBException {
+        try {
+            return (new UsersDAO(connection).getAll());
+        } catch (SQLException e) {
+            return null;
         }
     }
 
