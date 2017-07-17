@@ -1,39 +1,50 @@
 package main;
 
 
+import Servlet.Chat;
+import Servlet.Login;
+import accounts.AccountService;
 import dbService.DBException;
 import dbService.DBService;
 import dbService.dataSets.UsersDataSet;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
- * @author v.chibrikov
- *         <p>
- *         Пример кода для курса на https://stepic.org/
- *         <p>
- *         Описание курса и лицензия: https://github.com/vitaly-chibrikov/stepic_java_webserver
+ * Created by alex on 17.7.17.
  */
 public class Main {
     public static void main(String[] args) {
         DBService dbService = new DBService();
         try {
-            dbService.addUser("ALex","1111","ALex","Black");
-            dbService.addUser("Billy","2222","Billy","Blue");
-            dbService.addUser("Bob","3333","Bob","Green");
-            dbService.addUser("Join","4444","Join","Void");
+            AccountService accountService = new AccountService();
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.addServlet(new ServletHolder(new Login(dbService,accountService)), "/login");
+            context.addServlet(new ServletHolder(new Chat(dbService,accountService)), "/chat");
+
+            ResourceHandler resource_handler = new ResourceHandler();
+            resource_handler.setResourceBase("public_html");
+
+            HandlerList handlers = new HandlerList();
+            handlers.setHandlers(new Handler[]{resource_handler, context});
+
+            Server server = new Server(8081);
+            server.setHandler(handlers);
 
 
-//
-//            System.out.println("User data set: " + dbService.getUser("ALex"));
-//            System.out.println("User data set: " + dbService.getUser("Billy"));
-//            System.out.println("User data set: " + dbService.getUser("Bob"));
-            System.out.println("User data set: " + dbService.getAllUsers());
 
+            dbService.sendMessege("ALex","Bob","Hello World");
+            dbService.sendMessege("ALex","Billy","Hi, man");
 
-
-
-            dbService.cleanUp();
-        } catch (DBException e) {
+            server.start();
+            server.join();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

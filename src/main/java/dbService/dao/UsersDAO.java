@@ -1,5 +1,6 @@
 package dbService.dao;
 
+import dbService.dataSets.MessegeDataSet;
 import dbService.dataSets.UsersDataSet;
 import dbService.executor.Executor;
 
@@ -24,33 +25,16 @@ public class UsersDAO {
     }
 
     public UsersDataSet get(String login) throws SQLException {
-        return executor.execQuery("select * from users where login='" + login+"'", result -> {
+        return executor.execQuery("select * from users where Login='" + login+"'", result -> {
             result.next();
             return new UsersDataSet(result.getString(1), result.getString(2), result.getString(3), result.getString(4));
         });
     }
-    public List<UsersDataSet> getAll() throws SQLException {
-        return executor.execQuery("select * from users ", result -> {
-            List<UsersDataSet> users= new ArrayList<UsersDataSet>();
-            result.next();
-            while(!result.isLast()){
-                users.add( new UsersDataSet(result.getString(1), result.getString(2), result.getString(3), result.getString(4)));
-                result.next();
-            }
-            return users;
-        });
-    }
-
-//    public long getUserId(String name) throws SQLException {
-//        return executor.execQuery("select * from users where user_name='" + name + "'", result -> {
-//            result.next();
-//            return result.getLong(1);
-//        });
-//    }
 
     public void insertUser(String login,String password,String firstName,String lastName) throws SQLException {
         executor.execUpdate("insert into users (Login,Password,LastName,FirstName) values ('" + login + "','"+password+ "','"+firstName+ "','"+lastName+"')");
     }
+
 
     public void createTable() throws SQLException {
         executor.execUpdate("create table if not exists users (\n" +
@@ -61,7 +45,8 @@ public class UsersDAO {
                 "    )");
     }
 
-    public void dropTable() throws SQLException {
-        executor.execUpdate("drop table users");
-    }
+
+//    public void dropTable() throws SQLException {
+//        executor.execUpdate("drop table users");
+//    }
 }

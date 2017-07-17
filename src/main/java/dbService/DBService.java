@@ -1,21 +1,19 @@
 package dbService;
 
+import dbService.dao.MessegeDAO;
 import dbService.dao.UsersDAO;
+import dbService.dataSets.MessegeDataSet;
 import dbService.dataSets.UsersDataSet;
-import org.h2.jdbcx.JdbcDataSource;
 
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
- * @author v.chibrikov
- *         <p>
- *         Пример кода для курса на https://stepic.org/
- *         <p>
- *         Описание курса и лицензия: https://github.com/vitaly-chibrikov/stepic_java_webserver
+ * Created by alex on 17.7.17.
  */
 public class DBService {
     private final Connection connection;
@@ -28,15 +26,7 @@ public class DBService {
         try {
             return (new UsersDAO(connection).get(login));
         } catch (SQLException e) {
-                return null;
-//            throw new DBException(e);
-        }
-    }
-    public List<UsersDataSet> getAllUsers() throws DBException {
-        try {
-            return (new UsersDAO(connection).getAll());
-        } catch (SQLException e) {
-            return null;
+            throw new DBException(e);
         }
     }
 
@@ -46,6 +36,7 @@ public class DBService {
             UsersDAO dao = new UsersDAO(connection);
             dao.createTable();
             dao.insertUser(login,password,firstName,lastName);
+            new MessegeDAO(connection).createMessagesTable(login);
             connection.commit();
 
         } catch (SQLException e) {
@@ -62,23 +53,31 @@ public class DBService {
         }
     }
 
-    public void cleanUp() throws DBException {
-        UsersDAO dao = new UsersDAO(connection);
+    public void sendMessege(String recipient, String sender, String message) throws DBException {
         try {
-            dao.dropTable();
+            connection.setAutoCommit(false);
+            new MessegeDAO(connection).sendMessage(recipient,sender,message);
+            connection.commit();
+
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ignore) {
+            }
             throw new DBException(e);
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ignore) {
+            }
         }
     }
 
-    public void printConnectInfo() {
+    public Map<String, ArrayList<MessegeDataSet>> getMesseges(String login) throws DBException {
         try {
-            System.out.println("DB name: " + connection.getMetaData().getDatabaseProductName());
-            System.out.println("DB version: " + connection.getMetaData().getDatabaseProductVersion());
-            System.out.println("Driver: " + connection.getMetaData().getDriverName());
-            System.out.println("Autocommit: " + connection.getAutoCommit());
+            return (new MessegeDAO(connection).getMessages(login));
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DBException(e);
         }
     }
 
@@ -94,7 +93,7 @@ public class DBService {
                     append("localhost:").           //host name
                     append("3306/").                //port
                     append("database?").          //db name
-                    append("user=root&").          //login
+                    append("user=root&").          //Login
                     append("password=1130324");       //password
 
             System.out.println("URL: " + url + "\n");
